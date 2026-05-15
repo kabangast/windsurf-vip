@@ -224,69 +224,85 @@ function submitForm(context = '') {
   const pageText = document.body.innerText.toLowerCase();
   const isVerifyPage = /verify|verification|check your|inbox|code|otp/i.test(pageText);
 
-  // Strategy 1: Look for button[type="submit"] first (most reliable)
+  // Helper: try click with disabled override
+  function tryClick(el, label) {
+    if (!el || el.offsetParent === null) return false;
+    if (el.disabled) {
+      el.disabled = false;
+      el.removeAttribute('disabled');
+      el.removeAttribute('aria-disabled');
+      console.log('[WindsurfVIP] Enabled disabled button');
+    }
+    clickElement(el);
+    console.log('[WindsurfVIP] Clicked:', label, el.textContent.trim().substring(0, 40));
+    return true;
+  }
+
+  // Strategy 1: button[type="submit"]
   const allSubmits = document.querySelectorAll('button[type="submit"]');
   for (const btn of allSubmits) {
-    if (btn.offsetParent !== null) {
-      // If disabled, try to enable it first
-      if (btn.disabled) {
-        btn.disabled = false;
-        btn.removeAttribute('disabled');
-        console.log('[WindsurfVIP] Enabled disabled submit button');
-      }
-      clickElement(btn);
-      console.log('[WindsurfVIP] Clicked button[type="submit"]:', btn.textContent.trim().substring(0, 30));
-      return;
-    }
+    if (tryClick(btn, 'button[type="submit"]')) return;
   }
 
   // Strategy 2: On verification pages, "Create account" IS the correct button
   if (isVerifyPage || context === 'verify') {
     const verifyBtn = findButtonByText(['create account', 'verify', 'confirm', 'continue', 'submit', 'next']);
-    if (verifyBtn) {
-      if (verifyBtn.disabled) {
-        verifyBtn.disabled = false;
-        verifyBtn.removeAttribute('disabled');
-      }
-      clickElement(verifyBtn);
-      console.log('[WindsurfVIP] Clicked verify page button:', verifyBtn.textContent.trim().substring(0, 30));
-      return;
-    }
+    if (tryClick(verifyBtn, 'verify page button')) return;
   }
 
-  // Strategy 3: Standard form submit
+  // Strategy 3: Any button inside a <form>
   const form = document.querySelector('form');
-  if (form) {
-    const submitBtn = form.querySelector('button[type="submit"]');
-    if (submitBtn && submitBtn.offsetParent !== null) {
-      clickElement(submitBtn);
-      console.log('[WindsurfVIP] Form submitted via submit button');
-      return;
-    }
-  }
-
-  // Strategy 4: Text-based fallback
-  const priorityKeywords = ['continue', 'next', 'verify', 'confirm', 'submit', 'create account'];
-  for (const kw of priorityKeywords) {
-    const btn = findButtonByText([kw]);
-    if (btn) {
-      clickElement(btn);
-      console.log('[WindsurfVIP] Form submitted via text match:', kw);
-      return;
-    }
-  }
-
-  // Last resort: any visible button in form
   if (form) {
     const buttons = form.querySelectorAll('button');
     for (const btn of buttons) {
-      if (btn.offsetParent !== null) {
-        clickElement(btn);
-        console.log('[WindsurfVIP] Form submitted via form button (last resort)');
-        return;
-      }
+      if (tryClick(btn, 'form button')) return;
     }
   }
+
+  // Strategy 4: Common Windsurf class-based buttons (primary/CTA styles)
+  const classSelectors = [
+    'button[class*="primary"]',
+    'button[class*="cta"]',
+    'button[class*="submit"]',
+    'button[class*="continue"]',
+    'button[class*="bg-"]',
+    'button[class*="Button"]',
+    'button[class*="btn"]',
+    'button:not([type])', // buttons without explicit type
+  ];
+  for (const sel of classSelectors) {
+    const btns = document.querySelectorAll(sel);
+    for (const btn of btns) {
+      if (tryClick(btn, `class selector: ${sel}`)) return;
+    }
+  }
+
+  // Strategy 5: All visible <button> elements (broad sweep)
+  const allButtons = document.querySelectorAll('button');
+  for (const btn of allButtons) {
+    if (tryClick(btn, 'any visible button')) return;
+  }
+
+  // Strategy 6: Text-based fallback with expanded keywords
+  const priorityKeywords = [
+    'continue', 'next', 'verify', 'confirm', 'submit',
+    'create account', 'sign up', 'register', 'get started',
+    'start', 'go', 'done', 'save'
+  ];
+  for (const kw of priorityKeywords) {
+    const btn = findButtonByText([kw]);
+    if (tryClick(btn, `text match: ${kw}`)) return;
+  }
+
+  // Strategy 7: <a> tags that look like buttons
+  const linkButtons = document.querySelectorAll('a[role="button"], a.btn, a[class*="button"]');
+  for (const btn of linkButtons) {
+    if (tryClick(btn, 'link-as-button')) return;
+  }
+
+  // Strategy 8: Input[type="submit"]
+  const inputSubmit = document.querySelector('input[type="submit"]');
+  if (tryClick(inputSubmit, 'input[type="submit"]')) return;
 
   console.warn('[WindsurfVIP] Could not find submit button');
 }
