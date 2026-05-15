@@ -491,22 +491,43 @@ function checkTermsAndSubmit() {
 }
 
 function clickLogout() {
-  // Look for logout button with specific classes
-  const logoutBtn = document.querySelector('.body3.cursor-pointer.rounded-sm.px-4.py-2.font-medium.text-sk-black\\/60');
-  if (logoutBtn && /log out/i.test(logoutBtn.textContent)) {
-    clickElement(logoutBtn);
-    console.log('[WindsurfVIP] Clicked logout button');
-    return { clicked: true };
+  // Strategy 1: Navigate from known parent structure
+  // <div class="mt-auto flex flex-col gap-1 px-4">
+  //   <div class="body3 cursor-pointer ...">Log out</div>
+  // </div>
+  const parentDivs = document.querySelectorAll('.mt-auto.flex.flex-col.gap-1.px-4, .mt-auto');
+  for (const parent of parentDivs) {
+    const children = parent.querySelectorAll('div, button, a');
+    for (const child of children) {
+      if (child.textContent && child.textContent.trim() === 'Log out') {
+        clickElement(child);
+        console.log('[WindsurfVIP] Clicked logout via parent navigation');
+        return { clicked: true };
+      }
+    }
   }
 
-  // Fallback: look for any element containing "Log out" text
-  const allElements = document.querySelectorAll('*');
-  for (const el of allElements) {
-    if (el.offsetParent !== null && /log out/i.test(el.textContent) && el.textContent.trim() === 'Log out') {
-      clickElement(el);
-      console.log('[WindsurfVIP] Clicked logout (fallback)');
+  // Strategy 2: Find by text content using tree walker (more efficient than querySelectorAll('*'))
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT, null, false);
+  let node;
+  while ((node = walker.nextNode())) {
+    if (node.offsetParent !== null && node.textContent && node.textContent.trim() === 'Log out') {
+      clickElement(node);
+      console.log('[WindsurfVIP] Clicked logout via tree walker');
       return { clicked: true };
     }
+  }
+
+  // Strategy 3: XPath fallback for exact text match
+  const xpathResult = document.evaluate(
+    "//*[normalize-space(text())='Log out']",
+    document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null
+  );
+  const xpathNode = xpathResult.singleNodeValue;
+  if (xpathNode && xpathNode.offsetParent !== null) {
+    clickElement(xpathNode);
+    console.log('[WindsurfVIP] Clicked logout via XPath');
+    return { clicked: true };
   }
 
   console.warn('[WindsurfVIP] Logout button not found');
