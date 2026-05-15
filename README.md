@@ -25,15 +25,7 @@ cp .env.example .env
 # Edit .env with your card details (never commit this file)
 ```
 
-### 2. Set Up PHP Proxy
-
-Upload `proxy.php` to your own server. Update the `PROXY` constant in `background.js` to point to your endpoint:
-
-```javascript
-const PROXY = 'proxy.php';
-```
-
-### 3. Load Extension
+### 2. Load Extension
 
 1. Open Chrome → `chrome://extensions/`
 2. Enable **Developer mode**
