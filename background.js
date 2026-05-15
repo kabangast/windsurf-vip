@@ -350,6 +350,7 @@ async function reLoginMail(imei) {
 const STEPS = [
   'create_mail',
   'generate_data',
+  'check_logout',
   'open_register',
   'fill_form1',
   'submit_form1',
@@ -410,6 +411,54 @@ async function startRegistration(forceNew = false) {
       }
       log(`Name: ${session.firstName} ${session.lastName}`);
       log(`Password: ${session.accountPassword}`);
+      session.step = 'check_logout';
+      await saveSession(session);
+    }
+
+    // ---- STEP: check_logout ----
+    if (STEPS.indexOf(session.step) <= STEPS.indexOf('check_logout')) {
+      setStatus('Checking login status');
+      log('Checking if user is logged in...');
+
+      // Check if we have an existing tab or need to create one
+      let tabId = session.tabId;
+      let tabValid = false;
+
+      if (tabId) {
+        try {
+          const tab = await chrome.tabs.get(tabId);
+          tabValid = true;
+          log(`Existing tab found: ${tab.url}`);
+        } catch (e) {
+          tabValid = false;
+        }
+      }
+
+      if (!tabValid) {
+        log('No valid tab, creating new tab...');
+        const tab = await chrome.tabs.create({ url: 'https://windsurf.com/profile', active: true });
+        tabId = tab.id;
+        session.tabId = tabId;
+        await saveSession(session);
+        await waitForTabLoad(tabId);
+        await sleep(3000);
+      }
+
+      // Check if on profile page (logged in)
+      const tab = await chrome.tabs.get(tabId);
+      if (tab.url && tab.url.includes('/profile')) {
+        log('User is logged in on profile page. Logging out...');
+        await sendToTab(tabId, { action: 'clickLogout' });
+        await sleep(3000);
+
+        // Wait for redirect to login page
+        log('Waiting for redirect to login page...');
+        await waitForTabUrl(tabId, '/account/login', 30000);
+        log('Redirected to login page!', 'success');
+      } else {
+        log('User is not logged in, proceeding to registration...');
+      }
+
       session.step = 'open_register';
       await saveSession(session);
     }
@@ -418,8 +467,22 @@ async function startRegistration(forceNew = false) {
     if (STEPS.indexOf(session.step) <= STEPS.indexOf('open_register')) {
       setStatus('Opening register');
       log('Opening registration page...');
-      const tab = await chrome.tabs.create({ url: 'https://windsurf.com/account/register', active: true });
-      session.tabId = tab.id;
+
+      // Reuse existing tab if available, otherwise create new
+      let tab;
+      if (session.tabId) {
+        try {
+          tab = await chrome.tabs.get(session.tabId);
+          await chrome.tabs.update(session.tabId, { url: 'https://windsurf.com/account/register', active: true });
+        } catch (e) {
+          tab = await chrome.tabs.create({ url: 'https://windsurf.com/account/register', active: true });
+          session.tabId = tab.id;
+        }
+      } else {
+        tab = await chrome.tabs.create({ url: 'https://windsurf.com/account/register', active: true });
+        session.tabId = tab.id;
+      }
+
       session.step = 'fill_form1';
       await saveSession(session);
       await waitForTabLoad(session.tabId);

@@ -474,6 +474,29 @@ function checkTermsAndSubmit() {
   return { ok: false, totalDue: totalDue };
 }
 
+function clickLogout() {
+  // Look for logout button with specific classes
+  const logoutBtn = document.querySelector('.body3.cursor-pointer.rounded-sm.px-4.py-2.font-medium.text-sk-black\\/60');
+  if (logoutBtn && /log out/i.test(logoutBtn.textContent)) {
+    clickElement(logoutBtn);
+    console.log('[WindsurfVIP] Clicked logout button');
+    return { clicked: true };
+  }
+
+  // Fallback: look for any element containing "Log out" text
+  const allElements = document.querySelectorAll('*');
+  for (const el of allElements) {
+    if (el.offsetParent !== null && /log out/i.test(el.textContent) && el.textContent.trim() === 'Log out') {
+      clickElement(el);
+      console.log('[WindsurfVIP] Clicked logout (fallback)');
+      return { clicked: true };
+    }
+  }
+
+  console.warn('[WindsurfVIP] Logout button not found');
+  return { clicked: false };
+}
+
 // ==================== MESSAGE LISTENER ====================
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
@@ -511,6 +534,10 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
           break;
         case 'checkTermsAndSubmit':
           result = checkTermsAndSubmit();
+          sendResponse(result);
+          break;
+        case 'clickLogout':
+          result = clickLogout();
           sendResponse(result);
           break;
         default:
