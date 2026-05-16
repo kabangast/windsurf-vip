@@ -1,140 +1,586 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Windsurf VIP</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      width: 360px;
-      min-height: 300px;
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: #0f172a;
-      color: #e2e8f0;
-      padding: 20px;
+    :root {
+      --radius: 0.75rem;
+      --ring: 0 0% 63.9%;
+      --background: 0 0% 100%;
+      --foreground: 222.2 84% 4.9%;
+      --card: 0 0% 100%;
+      --card-foreground: 222.2 84% 4.9%;
+      --popover: 0 0% 100%;
+      --popover-foreground: 222.2 84% 4.9%;
+      --primary: 222.2 47.4% 11.2%;
+      --primary-foreground: 210 40% 98%;
+      --secondary: 210 40% 96.1%;
+      --secondary-foreground: 222.2 47.4% 11.2%;
+      --muted: 210 40% 96.1%;
+      --muted-foreground: 215.4 16.3% 46.9%;
+      --accent: 210 40% 96.1%;
+      --accent-foreground: 222.2 47.4% 11.2%;
+      --destructive: 0 84.2% 60.2%;
+      --destructive-foreground: 210 40% 98%;
+      --border: 214.3 31.8% 91.4%;
+      --input: 214.3 31.8% 91.4%;
+      --ring-offset: 0 0% 100%;
+      --success: 142 71% 45%;
+      --success-foreground: 210 40% 98%;
+      --warning: 38 92% 50%;
+      --warning-foreground: 210 40% 98%;
+      --info: 217 91% 60%;
+      --info-foreground: 210 40% 98%;
     }
-    h1 {
-      font-size: 18px;
+
+    [data-theme="dark"] {
+      --background: 222.2 84% 4.9%;
+      --foreground: 210 40% 98%;
+      --card: 222.2 84% 4.9%;
+      --card-foreground: 210 40% 98%;
+      --popover: 222.2 84% 4.9%;
+      --popover-foreground: 210 40% 98%;
+      --primary: 210 40% 98%;
+      --primary-foreground: 222.2 47.4% 11.2%;
+      --secondary: 217.2 32.6% 17.5%;
+      --secondary-foreground: 210 40% 98%;
+      --muted: 217.2 32.6% 17.5%;
+      --muted-foreground: 215 20.2% 65.1%;
+      --accent: 217.2 32.6% 17.5%;
+      --accent-foreground: 210 40% 98%;
+      --destructive: 0 62.8% 30.6%;
+      --destructive-foreground: 210 40% 98%;
+      --border: 217.2 32.6% 17.5%;
+      --input: 217.2 32.6% 17.5%;
+      --ring-offset: 222.2 84% 4.9%;
+      --success: 142 71% 45%;
+      --success-foreground: 210 40% 98%;
+      --warning: 38 92% 50%;
+      --warning-foreground: 210 40% 98%;
+      --info: 217 91% 60%;
+      --info-foreground: 210 40% 98%;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      width: 380px;
+      min-height: 320px;
+      font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+      background: hsl(var(--background));
+      color: hsl(var(--foreground));
+      padding: 16px;
+      transition: background 0.3s ease, color 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    body > * {
+      width: 100%;
+    }
+
+    /* Card */
+    .card {
+      background: hsl(var(--card));
+      border: 1px solid hsl(var(--border));
+      border-radius: var(--radius);
+      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-icon {
+      width: 48px;
+      height: 27px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .brand-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 6px;
+      animation: pulse-icon 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-icon {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.85; transform: scale(0.96); }
+    }
+
+    .brand-text h1 {
+      font-size: 15px;
       font-weight: 700;
-      color: #38bdf8;
+      letter-spacing: -0.01em;
+      color: hsl(var(--foreground));
+    }
+
+    .brand-text p {
+      font-size: 11px;
+      color: hsl(var(--muted-foreground));
+    }
+
+    /* Theme toggle */
+    .theme-toggle {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius);
+      border: 1px solid hsl(var(--border));
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: hsl(var(--muted-foreground));
+      transition: all 0.2s;
+    }
+
+    .theme-toggle:hover {
+      background: hsl(var(--accent));
+      color: hsl(var(--accent-foreground));
+    }
+
+    .theme-toggle svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    [data-theme="dark"] .sun-icon { display: none; }
+    [data-theme="light"] .moon-icon { display: none; }
+
+    /* Session alert */
+    .session-alert {
+      display: none;
+      margin-bottom: 12px;
+      padding: 10px 12px;
+      border-radius: var(--radius);
+      background: hsl(var(--warning) / 0.12);
+      border: 1px solid hsl(var(--warning) / 0.25);
+      font-size: 12px;
+      color: hsl(var(--warning));
+    }
+
+    .session-alert.visible { display: block; }
+
+    .session-alert .alert-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
       margin-bottom: 4px;
     }
-    .subtitle {
-      font-size: 12px;
-      color: #64748b;
-      margin-bottom: 20px;
+
+    .session-alert .alert-title svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      stroke-width: 2.5;
+      fill: none;
+      animation: spin-slow 3s linear infinite;
     }
-    #startBtn {
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      background: linear-gradient(135deg, #0ea5e9, #6366f1);
-      color: #fff;
-      font-size: 15px;
-      font-weight: 600;
+
+    @keyframes spin-slow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .session-alert #sessionDetail {
+      color: hsl(var(--muted-foreground));
+      font-size: 11px;
+    }
+
+    /* Buttons */
+    .btn-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 16px;
+      border-radius: var(--radius);
+      border: 1px solid hsl(var(--border));
+      font-size: 13px;
+      font-weight: 500;
       cursor: pointer;
-      transition: opacity 0.2s;
+      transition: all 0.2s;
+      font-family: inherit;
+      white-space: nowrap;
+      background: hsl(var(--card));
+      color: hsl(var(--foreground));
+      flex: 1;
     }
-    #startBtn:hover { opacity: 0.9; }
-    #startBtn:disabled {
+
+    .btn svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .btn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
     }
-    .log-container {
-      margin-top: 16px;
-      max-height: 200px;
-      overflow-y: auto;
-      border: 1px solid #1e293b;
-      border-radius: 8px;
-      padding: 10px;
-      background: #1e293b;
+
+    .btn:hover:not(:disabled) {
+      background: hsl(var(--accent));
+      transform: translateY(-1px);
     }
-    .log-entry {
-      font-size: 11px;
-      padding: 3px 0;
-      border-bottom: 1px solid #334155;
-      color: #94a3b8;
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      box-shadow: 0 0 6px currentColor;
     }
-    .log-entry:last-child { border-bottom: none; }
-    .log-entry.success { color: #4ade80; }
-    .log-entry.error { color: #f87171; }
-    .log-entry.info { color: #38bdf8; }
-    .stats {
-      margin-top: 16px;
-      display: flex;
-      gap: 10px;
-    }
-    .stat-box {
+
+    .dot-green { background: hsl(142 71% 45%); color: hsl(142 71% 45%); }
+    .dot-yellow { background: hsl(38 92% 50%); color: hsl(38 92% 50%); }
+    .dot-red { background: hsl(var(--destructive)); color: hsl(var(--destructive)); }
+
+    .btn-clear {
       flex: 1;
-      background: #1e293b;
-      border-radius: 8px;
-      padding: 10px;
+      padding: 10px 16px;
+      background: hsl(var(--card));
+      color: hsl(var(--foreground));
+      display: none;
+    }
+
+    .btn-clear.visible {
+      display: inline-flex;
+    }
+
+    .btn-stop {
+      display: none;
+      flex: 1;
+    }
+
+    .btn-stop.visible {
+      display: inline-flex;
+    }
+
+    /* Code display */
+    .code-card {
+      display: none;
+      margin-bottom: 12px;
+      padding: 14px;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, hsl(142 71% 45% / 0.08), hsl(142 71% 45% / 0.04));
+      border: 1px solid hsl(142 71% 45% / 0.2);
       text-align: center;
     }
-    .stat-box .value {
-      font-size: 20px;
-      font-weight: 700;
-      color: #38bdf8;
-    }
-    .stat-box .label {
+
+    .code-card.visible { display: block; }
+
+    .code-card .code-label {
       font-size: 10px;
-      color: #64748b;
-      margin-top: 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: hsl(142 71% 45%);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
     }
-    #credentialsList {
-      margin-top: 12px;
+
+    .code-card .code-label svg {
+      width: 12px;
+      height: 12px;
+      stroke: currentColor;
+      stroke-width: 2.5;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      animation: bounce 1.5s ease-in-out infinite;
     }
-    #exportBtn {
-      margin-top: 10px;
-      width: 100%;
-      padding: 8px;
-      border: 1px solid #334155;
-      border-radius: 6px;
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+
+    .code-card #codeValue {
+      font-size: 26px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      color: hsl(142 71% 45%);
+      letter-spacing: 6px;
+    }
+
+    /* Running-only elements */
+    .running-only { display: none !important; }
+    body.running .running-only { display: block !important; }
+    body.running .running-only.flex { display: flex !important; }
+
+    /* Stats */
+    .stats-row {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .stat-card {
+      padding: 10px 12px;
+      border-radius: var(--radius);
       background: transparent;
-      color: #94a3b8;
-      font-size: 12px;
-      cursor: pointer;
-      transition: background 0.2s;
+      border: 1px solid hsl(var(--border));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+      cursor: default;
     }
-    #exportBtn:hover { background: #1e293b; }
+
+    .stat-card:hover {
+      background: hsl(var(--accent));
+    }
+
+    .stat-card .stat-icon {
+      width: 14px;
+      height: 14px;
+      stroke: hsl(var(--muted-foreground));
+      stroke-width: 2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+
+    .stat-card .stat-value {
+      font-size: 13px;
+      font-weight: 500;
+      color: hsl(var(--foreground));
+      line-height: 1;
+    }
+
+    .stat-card .stat-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: hsl(var(--muted-foreground));
+    }
+
+    /* Logs */
+    .log-card {
+      padding: 10px;
+      border-radius: var(--radius);
+      background: hsl(var(--card));
+      border: 1px solid hsl(var(--border));
+      max-height: 180px;
+      overflow-y: auto;
+      margin-bottom: 12px;
+    }
+
+    .log-card.running-only { margin-bottom: 0; }
+    body.running .log-card.running-only { margin-bottom: 12px; }
+
+    .log-card::-webkit-scrollbar { width: 4px; }
+    .log-card::-webkit-scrollbar-track { background: transparent; }
+    .log-card::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 4px; }
+
+    .log-entry {
+      font-size: 11px;
+      padding: 5px 0;
+      border-bottom: 1px solid hsl(var(--border) / 0.5);
+      color: hsl(var(--muted-foreground));
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      line-height: 1.4;
+    }
+
+    .log-entry:last-child { border-bottom: none; }
+
+    .log-entry .log-time {
+      flex-shrink: 0;
+      font-size: 9px;
+      color: hsl(var(--muted-foreground) / 0.7);
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      margin-top: 1px;
+    }
+
+    .log-entry.success { color: hsl(var(--success)); }
+    .log-entry.error { color: hsl(var(--destructive)); }
+    .log-entry.info { color: hsl(var(--info)); }
+
+    .log-entry svg {
+      width: 12px;
+      height: 12px;
+      flex-shrink: 0;
+      margin-top: 2px;
+      stroke-width: 2.5;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .log-entry.success svg { stroke: hsl(var(--success)); }
+    .log-entry.error svg { stroke: hsl(var(--destructive)); }
+    .log-entry.info svg { stroke: hsl(var(--info)); }
+
+    /* Export */
+    .btn-outline {
+      width: 100%;
+      padding: 10px;
+      border-radius: var(--radius);
+      border: 1px solid hsl(var(--border));
+      background: transparent;
+      color: hsl(var(--muted-foreground));
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .btn-outline:hover {
+      background: hsl(var(--accent));
+      color: hsl(var(--accent-foreground));
+      border-color: hsl(var(--accent));
+    }
+
+    .btn-outline svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
   </style>
 </head>
 <body>
-  <h1>Windsurf VIP</h1>
-  <p class="subtitle">Auto Account Creator</p>
-
-  <div id="sessionInfo" style="display:none; background:#1e293b; border-radius:8px; padding:10px; margin-bottom:12px; font-size:11px; color:#94a3b8;">
-    <p style="color:#fbbf24; margin-bottom:4px; font-weight:600;">⚡ Pending session found</p>
-    <p id="sessionDetail"></p>
-  </div>
-
-  <div style="display:flex; gap:8px;">
-    <button id="startBtn" style="flex:1;">▶ Resume / Start</button>
-    <button id="newBtn" style="flex:1; background:linear-gradient(135deg, #f59e0b, #ef4444);">🔄 New</button>
-    <button id="clearBtn" style="flex:0 0 auto; background:#334155; padding:12px 14px;">🗑</button>
-  </div>
-
-  <div id="codeDisplay" style="display:none; background:#1e293b; border-radius:8px; padding:10px; margin:12px 0; text-align:center;">
-    <p style="font-size:10px; color:#64748b; margin-bottom:4px;">Verification Code</p>
-    <p id="codeValue" style="font-size:24px; font-weight:700; color:#4ade80; letter-spacing:4px; font-family:monospace;">------</p>
-  </div>
-
-  <div class="stats">
-    <div class="stat-box">
-      <div class="value" id="totalCount">0</div>
-      <div class="label">Total Created</div>
+  <div class="header">
+    <div class="brand">
+      <img src="icons/icon.png" alt="logo" style="width:44px;height:22px;border-radius:6px;object-fit:cover;flex-shrink:0;">
+      <div class="brand-text" style="display:flex;align-items:center;gap:6px;">
+        <span style="font-size:14px;font-weight:700;letter-spacing:-0.01em;color:hsl(var(--foreground));">Windsurf Auto Trial</span>
+        <span style="font-size:14px;font-weight:700;letter-spacing:-0.01em;color:hsl(var(--foreground));">Account Generator</span>
+      </div>
     </div>
-    <div class="stat-box">
-      <div class="value" id="statusText">Idle</div>
-      <div class="label">Status</div>
+    <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+      <svg class="sun-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      <svg class="moon-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+
+  <div class="session-alert" id="sessionInfo">
+    <div class="alert-title">
+      <svg viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+      Pending session found
+    </div>
+    <div id="sessionDetail"></div>
+  </div>
+
+  <div class="btn-group">
+    <button class="btn" id="startBtn">
+      <span class="status-dot dot-green"></span>
+      <span id="startBtnText">Start</span>
+    </button>
+    <button class="btn btn-stop" id="stopBtn">
+      <span class="status-dot dot-red"></span>
+      Stop
+    </button>
+    <button class="btn btn-clear" id="clearBtn" title="Clear session">
+      <span class="status-dot dot-red"></span>
+      Clear
+    </button>
+  </div>
+
+  <div class="code-card" id="codeDisplay">
+    <div class="code-label">
+      <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      Verification Code
+    </div>
+    <div id="codeValue">------</div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <svg class="stat-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <div class="stat-value" id="totalCount">0</div>
+      <div class="stat-label">Emails Generated</div>
+    </div>
+    <div class="stat-card running-only" id="statusCard">
+      <svg class="stat-icon" viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+      <div class="stat-value" id="statusText">Idle</div>
+      <div class="stat-label">Status</div>
     </div>
   </div>
 
-  <div class="log-container" id="logContainer"></div>
+  <div class="log-card running-only" id="logContainer"></div>
 
-  <button id="exportBtn">📋 Export Credentials (JSON)</button>
+  <button class="btn-outline" id="exportBtn" style="margin-bottom:12px;">
+    <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Download Generated Emails
+  </button>
+  <button class="btn-outline" id="viewBtn">
+    <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+    View Generated Emails
+  </button>
+
+  <div class="card" id="accountsModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:50;background:hsl(var(--background)/0.95);padding:16px;overflow:auto;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <h2 style="font-size:14px;font-weight:700;">Created Accounts</h2>
+      <button class="btn btn-ghost" id="closeModal" style="padding:6px 10px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        Close
+      </button>
+    </div>
+    <div id="accountsList"></div>
+  </div>
+
+  <footer style="margin-top:12px;padding-top:12px;border-top:1px solid hsl(var(--border)/0.5);text-align:center;color:hsl(var(--muted-foreground)/0.6);font-size:10px;line-height:1.6;">
+    <div style="display:flex;align-items:center;justify-content:center;gap:4px;">
+      © 2026 · Made with
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="hsl(var(--destructive))" stroke="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      by Abdulwahab
+    </div>
+    <div>📧 <a href="#" id="footerEmail" style="color:hsl(var(--muted-foreground)/0.6);text-decoration:none;">Show Email</a> · 🇹🇿 Tanzania</div>
+  </footer>
 
   <script src="popup.js"></script>
 </body>

@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Windsurf VIP Auto Register",
+  "name": "Windsurf Auto Trial Account Creator",
   "version": "1.0.0",
-  "description": "Auto-register Windsurf accounts using temp mail",
+  "description": "Auto-register Windsurf trial accounts using temp mail",
   "icons": {
     "16": "icons/icon.png",
     "48": "icons/icon.png",

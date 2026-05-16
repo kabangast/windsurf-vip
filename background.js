@@ -347,6 +347,17 @@ async function reLoginMail(imei) {
 
 // ==================== MAIN FLOW ====================
 
+let shouldStop = false;
+let isRunning = false;
+
+function checkStop() {
+  if (shouldStop) {
+    shouldStop = false;
+    isRunning = false;
+    throw new Error('Stopped by user');
+  }
+}
+
 const STEPS = [
   'create_mail',
   'generate_data',
@@ -370,6 +381,7 @@ const STEPS = [
 ];
 
 async function startRegistration(forceNew = false) {
+  isRunning = true;
   let session = null;
 
   if (!forceNew) {
@@ -384,6 +396,7 @@ async function startRegistration(forceNew = false) {
   }
 
   try {
+    checkStop();
     // ---- STEP: create_mail ----
     if (STEPS.indexOf(session.step) <= STEPS.indexOf('create_mail')) {
       setStatus('Creating email');
@@ -401,6 +414,7 @@ async function startRegistration(forceNew = false) {
     // Validate we have an email before proceeding
     if (!session.mailAddress) throw new Error('No email address in session. Start a new registration.');
 
+    checkStop();
     // ---- STEP: generate_data ----
     if (STEPS.indexOf(session.step) <= STEPS.indexOf('generate_data')) {
       if (!session.firstName) {
@@ -415,6 +429,7 @@ async function startRegistration(forceNew = false) {
       await saveSession(session);
     }
 
+    checkStop();
     // ---- STEP: check_logout ----
     if (STEPS.indexOf(session.step) <= STEPS.indexOf('check_logout')) {
       setStatus('Checking login status');
@@ -463,6 +478,7 @@ async function startRegistration(forceNew = false) {
       await saveSession(session);
     }
 
+    checkStop();
     // ---- STEP: open_register ----
     if (STEPS.indexOf(session.step) <= STEPS.indexOf('open_register')) {
       setStatus('Opening register');
@@ -508,6 +524,7 @@ async function startRegistration(forceNew = false) {
       await sleep(3000);
     }
 
+    checkStop();
     // ---- STEP: fill_form1 ----
     if (STEPS.indexOf(session.step) <= STEPS.indexOf('fill_form1')) {
       setStatus('Filling form 1');
@@ -521,6 +538,7 @@ async function startRegistration(forceNew = false) {
       await saveSession(session);
     }
 
+    checkStop();
     // ---- STEP: submit_form1 ----
     if (STEPS.indexOf(session.step) <= STEPS.indexOf('submit_form1')) {
       log('Submitting form 1...');
@@ -530,6 +548,7 @@ async function startRegistration(forceNew = false) {
       await saveSession(session);
     }
 
+    checkStop();
     // ---- STEP: fill_form2 ----
     if (STEPS.indexOf(session.step) <= STEPS.indexOf('fill_form2')) {
       setStatus('Filling password');
@@ -546,6 +565,7 @@ async function startRegistration(forceNew = false) {
       await saveSession(session);
     }
 
+    checkStop();
     // ---- STEP: submit_form2 ----
     if (STEPS.indexOf(session.step) <= STEPS.indexOf('submit_form2')) {
       log('Submitting password form...');
@@ -556,6 +576,7 @@ async function startRegistration(forceNew = false) {
       await saveSession(session);
     }
 
+    checkStop();
     // ---- STEP: wait_verification ----
     if (STEPS.indexOf(session.step) <= STEPS.indexOf('wait_verification')) {
       setStatus('Waiting for email');
@@ -577,6 +598,7 @@ async function startRegistration(forceNew = false) {
       await saveSession(session);
     }
 
+    checkStop();
     // ---- STEP: enter_code ----
     if (STEPS.indexOf(session.step) <= STEPS.indexOf('enter_code')) {
       if (session.verificationType === 'code') {
@@ -616,6 +638,7 @@ async function startRegistration(forceNew = false) {
       }
     }
 
+    checkStop();
     // ---- STEP: wait_profile ----
     if (STEPS.indexOf(session.step) <= STEPS.indexOf('wait_profile')) {
       setStatus('Waiting redirect');
@@ -626,6 +649,7 @@ async function startRegistration(forceNew = false) {
       await saveSession(session);
     }
 
+    checkStop();
     // ---- STEP: save_account ----
     if (STEPS.indexOf(session.step) <= STEPS.indexOf('save_account')) {
       setStatus('Saving');
@@ -635,6 +659,7 @@ async function startRegistration(forceNew = false) {
       await saveSession(session);
     }
 
+    checkStop();
     // ---- STEP: go_pricing ----
     if (STEPS.indexOf(session.step) <= STEPS.indexOf('go_pricing')) {
       setStatus('Going to pricing');
@@ -645,6 +670,7 @@ async function startRegistration(forceNew = false) {
       await saveSession(session);
     }
 
+    checkStop();
     // ---- STEP: click_free_trial ----
     if (STEPS.indexOf(session.step) <= STEPS.indexOf('click_free_trial')) {
       setStatus('Clicking free trial');
@@ -672,6 +698,7 @@ async function startRegistration(forceNew = false) {
       await saveSession(session);
     }
 
+    checkStop();
     // ---- STEP: wait_cloudflare ----
     if (STEPS.indexOf(session.step) <= STEPS.indexOf('wait_cloudflare')) {
       setStatus('Waiting for Cloudflare');
@@ -692,6 +719,7 @@ async function startRegistration(forceNew = false) {
       await saveSession(session);
     }
 
+    checkStop();
     // ---- STEP: wait_stripe ----
     if (STEPS.indexOf(session.step) <= STEPS.indexOf('wait_stripe')) {
       setStatus('Waiting for Stripe checkout');
@@ -703,6 +731,7 @@ async function startRegistration(forceNew = false) {
       await saveSession(session);
     }
 
+    checkStop();
     // ---- STEP: fill_payment ----
     if (STEPS.indexOf(session.step) <= STEPS.indexOf('fill_payment')) {
       setStatus('Filling payment');
@@ -734,6 +763,7 @@ async function startRegistration(forceNew = false) {
       await saveSession(session);
     }
 
+    checkStop();
     // ---- STEP: confirm_trial ----
     if (STEPS.indexOf(session.step) <= STEPS.indexOf('confirm_trial')) {
       setStatus('Confirming trial');
@@ -756,6 +786,7 @@ async function startRegistration(forceNew = false) {
       await saveSession(session);
     }
 
+    checkStop();
     // ---- STEP: wait_otp ----
     if (STEPS.indexOf(session.step) <= STEPS.indexOf('wait_otp')) {
       setStatus('Waiting for OTP');
@@ -768,9 +799,11 @@ async function startRegistration(forceNew = false) {
 
     // Done — clear session
     await clearSession();
+    isRunning = false;
     chrome.runtime.sendMessage({ type: 'done' }).catch(() => {});
 
   } catch (err) {
+    isRunning = false;
     log(`Error at step [${session.step}]: ${err.message}`, 'error');
     await saveSession(session);
     log('Session saved. Click "Resume" to retry from this step.', 'info');
@@ -798,8 +831,12 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   }
   if (msg.action === 'getSession') {
     getSession().then((session) => {
-      sendResponse({ session });
+      sendResponse({ session, isRunning });
     });
     return true;
+  }
+  if (msg.action === 'stopRegistration') {
+    shouldStop = true;
+    sendResponse({ ok: true });
   }
 });

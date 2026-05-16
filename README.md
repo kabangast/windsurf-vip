@@ -1,6 +1,6 @@
-# Windsurf VIP Auto Register
+# Windsurf Auto Trial Account Generator
 
-A Chrome extension that automates Windsurf account creation using temporary email addresses, with optional Stripe free trial signup.
+A Chrome extension that automates Windsurf account creation using temporary email addresses, with optional Stripe free trial signup. Features a modern dark/light mode UI with session management and account export.
 
 ## Features
 
@@ -13,6 +13,9 @@ A Chrome extension that automates Windsurf account creation using temporary emai
 - **Total Due Check** — Verifies "$0.00" before confirming trial
 - **OTP Pause** — Waits for manual bank OTP entry
 - **Export Accounts** — Saves credentials to local storage, exportable as JSON
+- **View & Manage** — Modal view of all created accounts with email/password/date
+- **Dark/Light Mode** — Toggle theme with animated sun/moon icons
+- **Stop Button** — Halt registration at any step
 
 ## Quick Start
 
@@ -77,8 +80,10 @@ CITY=random           # "random" = default city
 |--------|--------|
 | Resume / Start | Continue saved session or start new |
 | New | Force new registration (clears session) |
+| Stop | Stop running registration |
 | Clear | Reset session and logs |
-| Export Credentials | Download JSON of all saved accounts |
+| Download | Download JSON of all saved accounts |
+| View Emails | View list of created accounts in modal |
 
 ## Session Persistence
 
